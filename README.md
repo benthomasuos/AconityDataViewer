@@ -7,5 +7,5 @@ It uses the HTML5 canvas and d3.js Javascript library in order to overplot the r
 ## Project Phases
 
 There are two phases to this project
-- A web based data viewer that replays and visualises data downloaded from the Aconity machines
-- A live data viewer that displays data as the Aconity machines are conducting builds.
+* A web based data viewer that replays and visualises data downloaded from the Aconity machines
+* A live data viewer that displays data as the Aconity machines are conducting builds.
