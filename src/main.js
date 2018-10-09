@@ -131,6 +131,9 @@ function startPlot(){
 
     fileNum = 0
     files = ""
+    $('select#layers').html('')
+    var option = $('<option value="all">All layers</option>')
+    $('select#layers').append(option)
 
     appendCanvas('background', 0)
     console.log(main_ctx, main_canvas.width, main_canvas.height)
@@ -270,7 +273,7 @@ function animateData(timestep){
 
     if(step < pyroData.length - step_size ){
 
-        for( var i=0; i < step_size; i++){
+        for( var i=0; i < step_size; i+=5){
             //stepDiv.html(step + "/" + pyroData.length )
             //layerProg.val(step-step_size + i)
             var p1 = pyroData[step - step_size + i]
@@ -379,16 +382,31 @@ function appendCanvas(layerName, layer_num){
     //main_ctx.fillRect(0, 0, main_canvas[0].width, main_canvas[0].height)
     var option = $('<option value="'+ layerName +'">'+ layerName +'</option>')
     $('select#layers').append(option)
+    var numLayers = $('input[type="range"]#layers').attr('max')
+    $('input[type="range"]#layers').attr('max', Number(numLayers) + 1)
 
     return main_ctx
 }
 
-
-$('select#layers').on('change', function(){
-    var layer = $(this).val()
+$('input[type="range"]#layers').on('input', function(){
+    var num = $(this).val()
+    var layer = files[num].name
     console.log("Showing layer: " + layer)
     $('.main').not('#background').hide()
     $('#'+layer).show()
+
+})
+
+$('select#layers').on('change', function(){
+    var layer = $(this).val()
+    if(layer == 'all'){
+        $('.main').show()
+    }
+    else{
+        console.log("Showing layer: " + layer)
+        $('.main').not('#background').hide()
+        $('#'+layer).show()
+    }
 
 })
 
