@@ -1,6 +1,5 @@
-var pyroCanvas = document.getElementById('pyroCanvas')
-var pyro_ctx = pyroCanvas.getContext('2d')
-
+var main_canvas = null
+var main_ctx = null
 var colorCanvas = document.getElementById('colorCanvas')
 var color_ctx = colorCanvas.getContext('2d')
 var tempCanvas = document.getElementById('tempCanvas')
@@ -45,6 +44,8 @@ var temp = {
     cut_min: 920,
     cut_max: 1250
 }
+
+
 
 
 var settings = {}
@@ -110,8 +111,8 @@ function plotLayer(data){
         var x = Math.floor((parseInt(point[0]) + parseInt(offsetX.val()) )) * zoom.val()
         var y = Math.floor((parseInt(point[1]) + parseInt(offsetY.val()) )) * zoom.val()
         var temp = parseInt(point[2])
-        pyro_ctx.fillStyle = colorScale(temp)
-        pyro_ctx.fillRect(x, y, 1,1);
+        main_ctx.fillStyle = colorScale(temp)
+        main_ctx.fillRect(x, y, 1,1);
 
     }
 }
@@ -131,9 +132,12 @@ function startPlot(){
     fileNum = 0
     files = ""
 
-    pyro_ctx.fillStyle = '#000'
-    pyro_ctx.fillRect(0, 0, pyroCanvas.width, pyroCanvas.height)
-    //pyro_ctx.clearRect(0, 0, pyroCanvas.width, pyroCanvas.height)
+    appendCanvas('background', 0)
+    console.log(main_ctx, main_canvas.width, main_canvas.height)
+
+    main_ctx.fillStyle = '#000'
+    main_ctx.fillRect(0, 0, main_canvas[0].width, main_canvas[0].height)
+    //main_ctx.clearRect(0, 0, main_canvas.width, main_canvas.height)
 
     files = $('#pyro_file')[0].files
     buildProg.val(0)
@@ -158,7 +162,7 @@ function startPlot(){
 
         colorScale.clamp(true)
 
-          setupFile()
+        setupFile()
     }
 }
 
@@ -198,25 +202,25 @@ function setupFile(){
 
     reader.onloadend = function(event){
         var lines = this.result.split('\n');
+        console.log(this, event)
+        appendCanvas(files[fileNum].name, fileNum)
+
         pyroData = lines
         layerProg.val(0)
         layerProg.attr('max', pyroData.length )
 
 
 
-        plotData(function(data){
+        plotData(this.name,function(data){
             pyroData = data
             //console.log(pyroData)
             console.log("Using data to setup plot area")
-            xScale = d3.scaleLinear().domain(d3.extent(pyroData, function(d){return d.x})).range([0,pyroCanvas.width])
-            yScale = d3.scaleLinear().domain(d3.extent(pyroData, function(d){return d.y})).range([pyroCanvas.height, 0])
-          //  xScale = d3.scaleLinear().domain([-22000,-12000]).range([0,pyroCanvas.width])
-            //yScale = d3.scaleLinear().domain([-22000,-12000]).range([pyroCanvas.height, 0])
+            xScale = d3.scaleLinear().domain(d3.extent(pyroData, function(d){return d.x})).range([0,main_canvas[0].width])
+            yScale = d3.scaleLinear().domain(d3.extent(pyroData, function(d){return d.y})).range([main_canvas[0].height, 0])
+          //  xScale = d3.scaleLinear().domain([-22000,-12000]).range([0,main_canvas.width])
+            //yScale = d3.scaleLinear().domain([-22000,-12000]).range([main_canvas.height, 0])
 
-
-
-
-
+            console.log(main_ctx)
             animate = window.requestAnimationFrame(animateData)
         })
 
@@ -240,7 +244,7 @@ function setupFile(){
 
 
 
-function plotData(callback){
+function plotData(layer, callback){
       pyroArray = []
       pyroData.forEach(function(d,i){
           var point = d.split(" ")
@@ -263,9 +267,10 @@ function plotData(callback){
 function animateData(timestep){
   //  console.log(pyroData[0])
 
+
     if(step < pyroData.length - step_size ){
 
-        for( var i=0; i < step_size; i+=2){
+        for( var i=0; i < step_size; i++){
             //stepDiv.html(step + "/" + pyroData.length )
             //layerProg.val(step-step_size + i)
             var p1 = pyroData[step - step_size + i]
@@ -303,20 +308,20 @@ function animateData(timestep){
 
 
             if(temp1 >= temp.cut_min && temp1 <= temp.cut_max){
-                pyro_ctx.fillStyle = colorScale(temp1)
-                pyro_ctx.fillRect(x0, y0, 1,1);
+                main_ctx.fillStyle = colorScale(temp1)
+                main_ctx.fillRect(x0, y0, 1,1);
             }
 /*
             else if(temp1 < temp.cut_min){
-                pyro_ctx.fillStyle = "#00f"
+                main_ctx.fillStyle = "#00f"
             }
             else if( temp1 > temp.cut_max){
-              pyro_ctx.fillStyle = "#f00"
+              main_ctx.fillStyle = "#f00"
             }
 
 */
 
-          //  pyro_ctx.fillStyle = colorScale(temp1)
+          //  main_ctx.fillStyle = colorScale(temp1)
 
 
             // Plot data graph
@@ -359,6 +364,38 @@ function animateData(timestep){
 }
 
 
+function appendCanvas(layerName, layer_num){
+    var layerName = layerName.split('.pcd')[0].replace('.','_')
+    main_canvas = $('<canvas></canvas>').addClass('main')
+                        .attr('id',layerName)
+                        //.css('z-index', layer_num)
+    main_canvas[0].width = 800
+    main_canvas[0].height = 800
+    $('div#canvasContainer').append(main_canvas)
+
+
+    main_ctx = main_canvas[0].getContext('2d')
+    //main_ctx.fillStyle = 'rgba(255,255,255,0)'
+    //main_ctx.fillRect(0, 0, main_canvas[0].width, main_canvas[0].height)
+    var option = $('<option value="'+ layerName +'">'+ layerName +'</option>')
+    $('select#layers').append(option)
+
+    return main_ctx
+}
+
+
+$('select#layers').on('change', function(){
+    var layer = $(this).val()
+    console.log("Showing layer: " + layer)
+    $('.main').not('#background').hide()
+    $('#'+layer).show()
+
+})
+
+
+
+
+
 function init_colorBar(scale){
 
     var grd = color_ctx.createLinearGradient(0,colorCanvas.height, colorCanvas.width,0);
@@ -397,12 +434,12 @@ function drawTempVal(val){
 
 
 /*
-$('#pyroCanvas').on('zoom', function(evt){
+$('#main_canvas').on('zoom', function(evt){
     zoom(evt)
 
 })
 
-$('#pyroCanvas').on('mousedown', function(evt){
+$('#main_canvas').on('mousedown', function(evt){
     translate(evt)
 
 })
@@ -411,26 +448,26 @@ $('#pyroCanvas').on('mousedown', function(evt){
 function translate(evt){
 
     console.log("Moving view")
-    pyro_ctx.save()
-    var savedCanvas = new Image(pyro_ctx)
-    pyro_ctx.clearRect(0, 0, pyroCanvas.width, pyroCanvas.height);
+    main_ctx.save()
+    var savedCanvas = new Image(main_ctx)
+    main_ctx.clearRect(0, 0, main_canvas[0].width, main_canvas[0].height);
 
-    pyro_ctx.translate(evt.ClientX, evt.ClientY)
-    pyro_ctx.restore()
+    main_ctx.translate(evt.ClientX, evt.ClientY)
+    main_ctx.restore()
 
 }
 
 
 function zoom(evt){
     console.log("Zooming")
-    pyro_ctx.save()
-    //pyro_ctx.scale(transform.k, transform.k);
+    main_ctx.save()
+    //main_ctx.scale(transform.k, transform.k);
 }
 
 /*
 function getPixel(position){
 
-    var imageData = pyro_ctx.getImageData( 0, 0, )
+    var imageData = main_ctx.getImageData( 0, 0, )
 
 
 }

@@ -24,6 +24,7 @@ body {
     overflow-x: hidden;
 }
 
+
 .title-header{
     width: 100%;
     min-height: 200px;
@@ -782,67 +783,39 @@ canvas {
 
 
 
-#pyroDiv{
-    display: flex;
-    flex-flow: row;
-    align-items: flex-start;
-    justify-content: flex-start;
 
+div#canvasContainer{
+    position: absolute;
+    top: 180px;
+    right: 20px;
+    width: 800px;
+    height: 800px;
 }
 
+canvas.main{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+
 #display_controls{
+    position: absolute;
+    left: 0px;
+    top: 180px;
     display: flex;
     flex-flow: column;
     width: 360px;
     height: 800px;
-    padding-left: 10px;
+    margin-left: 20px;
 
-
-}
-
-.unit-value{
-    display: inline-block;
-    width: 100px;
-    height: 30px;
-    font-size: 1.2em;
-    font-weight: 600;
-
-}
-
-div > span {
-
-    display: inline-block;
-    width: 80px;
-    height: 30px;
-    font-size: 1.2em;
-    font-weight: 600;
-    text-align: right;
-    padding-right: 10px;
-}
-
-
-#pyroDiv {
-    display: flex;
-    flex-flow: row;
-    justify-content: center;
-    margin-top: 50px;
-    margin-bottom: 50px;
-
-}
-
-
-.control-div{
-    margin-top: 10px;
-    height: 60px;
-    display: flex;
-    flex-flow: row;
-    align-items: center;
-    justify-content: space-around;
 
 }
 
 #colorBar {
-    position: relative;
+    position:absolute;
+    left: 400px;
+    top: 180px;
     width: 30px;
     margin-left: 40px;
     margin-right: 20px
@@ -868,6 +841,42 @@ div > span {
 
 
 }
+
+.unit-value{
+    display: inline-block;
+    width: 100px;
+    height: 30px;
+    font-size: 1.2em;
+    font-weight: 600;
+
+}
+
+div > span {
+
+    display: inline-block;
+    width: 80px;
+    height: 30px;
+    font-size: 1.2em;
+    font-weight: 600;
+    text-align: right;
+    padding-right: 10px;
+}
+
+
+
+
+
+.control-div{
+    margin-top: 10px;
+    height: 60px;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-around;
+
+}
+
+
 
 progress {
     width: 100%;
